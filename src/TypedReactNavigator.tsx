@@ -53,7 +53,10 @@ type RouterOpts = {
   initialNavigationState?: RootNavigationState<any>;
 };
 
-export function createRouter<T extends RouteDef>(rootDefinition: T, opts?: RouterOpts): TypedReactNavigator<T> {
+export function createTypedReactNavigator<T extends RouteDef>(
+  rootDefinition: T,
+  opts?: RouterOpts,
+): TypedReactNavigator<T> {
   const thisRouter = new TypedReactNavigator(rootDefinition, opts);
 
   return thisRouter as any;

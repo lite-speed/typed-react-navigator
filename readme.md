@@ -12,7 +12,7 @@ unnecessary re-renders and (2) We ["freeze"](https://www.npmjs.com/package/react
 
 ```tsx
 import { Button, Text, View } from "react-native";
-import { createRouter, createRouteDefinition, ParamTypes, lazy } from "typed-react-navigator";
+import { createTypedReactNavigator, createRouteDefinition, ParamTypes, lazy } from "typed-react-navigator";
 const routeDef = createRouteDefinition({
   //Declare the type of root navigator. Options are "switch" or "stack"
   type: "switch",
@@ -60,7 +60,7 @@ const routeDef = createRouteDefinition({
 });
 
 //Export all the key functions and constants you will use throughout your app. These will be FULLY TYPED using the shape of your route definition
-const { Navigator, PATHS, goBack, navigate, useParams } = createRouter(routeDef);
+const { Navigator, PATHS, goBack, navigate, useParams } = createTypedReactNavigator(routeDef);
 
 export function App() {
   //Render the navigator at the root of your app
@@ -75,7 +75,7 @@ export function App() {
 import React from "react";
 import { Button, Text, View } from "react-native";
 
-import { createRouter, createRouteDefinition, ParamTypes } from "typed-react-navigator";
+import { createTypedReactNavigator, createRouteDefinition, ParamTypes } from "typed-react-navigator";
 const routeDef = createRouteDefinition({
   type: "switch",
   routes: {
@@ -116,7 +116,7 @@ const routeDef = createRouteDefinition({
 });
 
 //NOTE EXPORTS BELOW! These are how params will be consumed and navigation will occur.
-export const { Navigator, PATHS, goBack, navigate, useParams } = createRouter(routeDef);
+export const { Navigator, PATHS, goBack, navigate, useParams } = createTypedReactNavigator(routeDef);
 
 //App.tsx
 import { Navigator } from "./router.tsx";
