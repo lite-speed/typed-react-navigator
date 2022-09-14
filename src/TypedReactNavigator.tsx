@@ -62,7 +62,7 @@ export function createTypedReactNavigator<T extends RouteDef>(
   return thisRouter as any;
 }
 
-class TypedReactNavigator<T extends RouteDef> extends TypedNavigator<T> {
+export class TypedReactNavigator<T extends RouteDef> extends TypedNavigator<T> {
   #getDefAtPath = _.memoize(
     (pathArr: string[]) => {
       let retDef: RouteDef;
