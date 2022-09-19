@@ -7,6 +7,7 @@ import {
   $pathType,
   $paramsType,
   ParamsInputObj,
+  RouteDefWithoutUI,
 } from "typed-navigator";
 import { PathObjResult } from "typed-navigator";
 import { MultiTypeComponent, RouteDef, StackRouteDef, SwitchRouteDef } from "typed-navigator";
@@ -644,43 +645,7 @@ export class TypedReactNavigator<T extends RouteDef> extends TypedNavigator<T> {
     dequal,
   );
 
-  /**
-   * Hook that returns params satisfying the `pathConstraint` found at the nearest parent navigator.
-   * Throws an error if the component has no parent navigator satisfying the `pathConstraint`.
-   * Optionally also supply a selector function as the second parameter to reduce re-renders
-   *
-   * @example
-   * // ✅ Satisfies constraint
-   * function BazPage(){
-   *    const { bloopParam, bazParam } = useParams(PATHS.bloop.baz);
-   * }
-   *
-   * @example
-   * // ❌ FooPage does not satisfy constraint PATHS.bloop.baz
-   * function FooPage(){
-   *    const { bazParam } = useParams(PATHS.bloop.baz);
-   * }
-   *
-   * @example
-   * // Also note, it's okay to use less specific path selectors if you don't need all the params. This can potentially make a component easier to re-use within a component subtree.
-   * function BazPage(){
-   *    const { bloopParam } = useParams(PATHS.bloop);
-   * }
-   *
-   * @example
-   * //Use a selector to reduce re-renders
-   * function BazPage(){
-   *    const yesNo = useParams(PATHS.bloop.baz, a => a.bazParam > 5 ? 'yes' : 'no');
-   * }
-   */
-  public useParams<Path extends PathObjResult<any, any, any, any, any, any, any, any>>(
-    pathConstraint: Path,
-  ): ExtractObjectPath<ParamsOutputObj<T>, Path[$pathType]>[$paramsType];
-  public useParams<Path extends PathObjResult<any, any, any, any, any, any, any, any>, Ret>(
-    pathConstraint: Path,
-    selector: (params: ExtractObjectPath<ParamsOutputObj<T>, Path[$pathType]>[$paramsType]) => Ret,
-  ): Ret;
-  public useParams(pathConstraint: PathObjResult<any, any, any, any, any, any, any, any>, selector?: (a: any) => any) {
+  public useParams: UseParams<T> = ((pathConstraint: any, selector: any) => {
     const constraintPath = this.getPathArrFromPathObjResult(pathConstraint);
     const componentAbsPath = this.#useAbsoluteNavStatePath();
     const componentPath = absoluteNavStatePathToRegularPath(componentAbsPath);
@@ -697,7 +662,7 @@ export class TypedReactNavigator<T extends RouteDef> extends TypedNavigator<T> {
 
       return selector ? selector(params) : params;
     });
-  }
+  }) as any;
 
   #getAccumulatedParamsAtAbsoluteNavStatePath(navStatePath: AbsNavStatePath) {
     const rootState = this.#navigationStateStore.get();
@@ -1164,3 +1129,43 @@ type LinkComponentProps<Path, ComponentProps, Params> = {
   path: Path;
   params: Params;
 } & Omit<ComponentProps, "onPress"> & { onPress?: () => void } & LinkProps;
+
+/**
+ * Hook that returns params satisfying the `pathConstraint` found at the nearest parent navigator.
+ * Throws an error if the component has no parent navigator satisfying the `pathConstraint`.
+ * Optionally also supply a selector function as the second parameter to reduce re-renders
+ *
+ * @example
+ * // ✅ Satisfies constraint
+ * function BazPage(){
+ *    const { bloopParam, bazParam } = useParams(PATHS.bloop.baz);
+ * }
+ *
+ * @example
+ * // ❌ FooPage does not satisfy constraint PATHS.bloop.baz
+ * function FooPage(){
+ *    const { bazParam } = useParams(PATHS.bloop.baz);
+ * }
+ *
+ * @example
+ * // Also note, it's okay to use less specific path selectors if you don't need all the params. This can potentially make a component easier to re-use within a component subtree.
+ * function BazPage(){
+ *    const { bloopParam } = useParams(PATHS.bloop);
+ * }
+ *
+ * @example
+ * //Use a selector to reduce re-renders
+ * function BazPage(){
+ *    const yesNo = useParams(PATHS.bloop.baz, a => a.bazParam > 5 ? 'yes' : 'no');
+ * }
+ */
+type UseParams<T extends RouteDefWithoutUI> = {
+  <Path extends PathObjResult<any, any, any, any, any, any, any, any>>(pathConstraint: Path): ExtractObjectPath<
+    ParamsOutputObj<T>,
+    Path[$pathType]
+  >[$paramsType];
+  <Path extends PathObjResult<any, any, any, any, any, any, any, any>, Ret>(
+    pathConstraint: Path,
+    selector: (params: ExtractObjectPath<ParamsOutputObj<T>, Path[$pathType]>[$paramsType]) => Ret,
+  ): Ret;
+};
